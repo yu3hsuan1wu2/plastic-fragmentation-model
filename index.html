@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>負二項式碎片化模型互動理解工具</title>
+  <title>負二項分布碎片化模型互動理解工具</title>
   <style>
     :root {
       --bg: #f7f7f2;
@@ -472,11 +472,53 @@
         grid-template-columns: 78px 1fr 78px;
       }
     }
+  
+
+    .formula-toggle {
+      display: inline-flex;
+      gap: 8px;
+      padding: 6px;
+      background: #eef2f7;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      margin: 8px 0 14px;
+    }
+
+    .formula-mode {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: 0.2s ease;
+    }
+
+    .formula-mode.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .formula-view.hidden {
+      display: none;
+    }
+
+    .codeblock {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 14px;
+      line-height: 1.65;
+    }
   </style>
+
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
   <header>
-    <div class="eyebrow">互動式理解工具｜負二項式碎片化模型</div>
+    <div class="eyebrow">互動式理解工具｜負二項分布碎片化模型</div>
     <h1>塑膠不是一次碎完，而是每個月把「磨耗質量」分配到更小粒徑箱</h1>
     <p class="subtitle">
       左欄用作者視角拆解模型邏輯；右欄讓你調整參數，看質量如何從 6 mm 母體塑膠逐步流向 1.25 mm、300 µm、75 µm 與 25 µm。
@@ -500,7 +542,7 @@
         <div id="story" class="tab-content active">
           <div class="concept-card">
             <h3>一句話版本</h3>
-            <p>每個月塑膠先損失一點質量，這些磨耗掉的質量再依負二項式分布，重新分配到比母體更小的粒徑箱。</p>
+            <p>每個月塑膠先損失一點質量，這些磨耗掉的質量再依負二項分布分布，重新分配到比母體更小的粒徑箱。</p>
           </div>
 
           <div class="flow">
@@ -521,7 +563,7 @@
             <div class="flow-step">
               <div class="num">3</div>
               <div>
-                <strong>用負二項式分配</strong>
+                <strong>用負二項分布分配</strong>
                 <span>磨耗掉的質量不會消失，而是依機率分配到更小粒徑箱。</span>
               </div>
             </div>
@@ -537,11 +579,80 @@
 
         <div id="formula" class="tab-content">
           <div class="concept-card">
-            <h3>負二項式 PMF</h3>
-            <div class="formula">
-              PMF<sub>m</sub>(k) = Γ(k + f) / [Γ(k + 1)Γ(f)] × p<sup>k</sup> × (1 − p)<sup>f</sup>
+            <h3>負二項分布 PMF</h3>
+            <div class="formula-toggle" aria-label="公式呈現模式">
+              <button class="formula-mode active" data-formula-view="latex">LaTeX 呈現</button>
+              <button class="formula-mode" data-formula-view="markdown">MD / LaTeX 語法</button>
             </div>
+
+            <div id="formulaLatex" class="formula formula-view">
+              $$
+              &bsol;mathrm{PMF}_{m}(k)=
+              &bsol;frac{&bsol;Gamma(k+f)}{&bsol;Gamma(k+1)&bsol;Gamma(f)}
+              p^{k}(1-p)^{f}
+              $$
+            </div>
+
+            <div id="formulaMarkdown" class="formula formula-view hidden">
+              <pre class="codeblock">```math
+&bsol;mathrm{PMF}_{m}(k)=
+&bsol;frac{&bsol;Gamma(k+f)}{&bsol;Gamma(k+1)&bsol;Gamma(f)}
+p^{k}(1-p)^{f}
+```
+
+或使用 LaTeX display math：
+
+$$
+&bsol;mathrm{PMF}_{m}(k)=
+&bsol;frac{&bsol;Gamma(k+f)}{&bsol;Gamma(k+1)&bsol;Gamma(f)}
+p^{k}(1-p)^{f}
+$$</pre>
+            </div>
+
             <p>這個公式會先給每個「可能的較小粒徑箱」一個權重，接著再標準化，讓所有權重加起來等於 1。</p>
+          </div>
+
+          <div class="concept-card">
+            <h3>質量更新式</h3>
+            <div class="formula-toggle" aria-label="質量更新式呈現模式">
+              <button class="formula-mode active" data-formula-view="mass-latex">LaTeX 呈現</button>
+              <button class="formula-mode" data-formula-view="mass-markdown">MD / LaTeX 語法</button>
+            </div>
+
+            <div id="massLatex" class="formula formula-view">
+              $$
+              E_i(t)=rM_i(t)
+              $$
+              $$
+              M_i(t+1)=M_i(t)-E_i(t)
+              $$
+              $$
+              M_j(t+1)=M_j(t)+E_i(t)w_{ij}
+              $$
+              $$
+              w_{ij}=&bsol;frac{&bsol;mathrm{PMF}_{m}(k_j)}{&bsol;sum_{j<i}&bsol;mathrm{PMF}_{m}(k_j)}
+              $$
+            </div>
+
+            <div id="massMarkdown" class="formula formula-view hidden">
+              <pre class="codeblock">```math
+E_i(t)=rM_i(t)
+```
+
+```math
+M_i(t+1)=M_i(t)-E_i(t)
+```
+
+```math
+M_j(t+1)=M_j(t)+E_i(t)w_{ij}
+```
+
+```math
+w_{ij}=&bsol;frac{&bsol;mathrm{PMF}_{m}(k_j)}{&bsol;sum_{j<i}&bsol;mathrm{PMF}_{m}(k_j)}
+```</pre>
+            </div>
+
+            <p>這組式子是在說：每月先從母粒徑箱磨耗出一部分質量，再把這些質量依標準化權重分配到較小粒徑箱。</p>
           </div>
 
           <div class="term-grid">
@@ -556,7 +667,7 @@
           <div class="concept-card">
             <h3>方法章可以這樣寫</h3>
             <p>
-              本研究使用質量基礎的負二項式碎片化模型，模擬浮力塑膠在長期風化與磨耗後的粒徑轉移。於每個月時間步中，各非終端粒徑箱會依指定降解率損失部分質量；此被磨耗出的質量再依負二項式機率分布重新分配至較小粒徑箱。為確保質量守恆，所有可分配至較小粒徑箱的機率會進行標準化，使每月損失質量完整轉移至子粒徑箱。
+              本研究使用質量基礎的負二項分布碎片化模型，模擬浮力塑膠在長期風化與磨耗後的粒徑轉移。於每個月時間步中，各非終端粒徑箱會依指定降解率損失部分質量；此被磨耗出的質量再依負二項分布機率分布重新分配至較小粒徑箱。為確保質量守恆，所有可分配至較小粒徑箱的機率會進行標準化，使每月損失質量完整轉移至子粒徑箱。
             </p>
           </div>
           <div class="concept-card">
@@ -673,7 +784,7 @@
   </main>
 
   <footer>
-    註：此工具為教學用的簡化互動版本，用來理解負二項式碎片化模型的邏輯。實際研究可再加入沉降、聚集、解聚、海水密度與深度剖面等機制。
+    註：此工具為教學用的簡化互動版本，用來理解負二項分布碎片化模型的邏輯。實際研究可再加入沉降、聚集、解聚、海水密度與深度剖面等機制。
   </footer>
 
   <script>
@@ -708,6 +819,29 @@
         document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
         btn.classList.add("active");
         document.getElementById(btn.dataset.tab).classList.add("active");
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          window.MathJax.typesetPromise();
+        }
+      });
+    });
+
+    const formulaViewMap = {
+      "latex": "formulaLatex",
+      "markdown": "formulaMarkdown",
+      "mass-latex": "massLatex",
+      "mass-markdown": "massMarkdown"
+    };
+
+    document.querySelectorAll(".formula-mode").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const group = btn.closest(".concept-card");
+        group.querySelectorAll(".formula-mode").forEach(b => b.classList.remove("active"));
+        group.querySelectorAll(".formula-view").forEach(view => view.classList.add("hidden"));
+        btn.classList.add("active");
+        document.getElementById(formulaViewMap[btn.dataset.formulaView]).classList.remove("hidden");
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          window.MathJax.typesetPromise();
+        }
       });
     });
 
@@ -845,7 +979,7 @@
         tone = "多數質量已流向 25 µm 與 75 µm，代表模型中的塑膠已大量進入可輸出的微塑膠狀態。";
       }
 
-      dynamicExplain.innerHTML = `<strong>觀察提示：</strong>${tone} 這裡的重點是「質量轉移」：每月磨耗掉的質量，經過負二項式權重分配後，逐步從大粒徑流向小粒徑。`;
+      dynamicExplain.innerHTML = `<strong>觀察提示：</strong>${tone} 這裡的重點是「質量轉移」：每月磨耗掉的質量，經過負二項分布權重分配後，逐步從大粒徑流向小粒徑。`;
     }
 
     [pSlider, fSlider, rSlider, monthSlider].forEach(el => el.addEventListener("input", update));
