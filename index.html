@@ -514,7 +514,29 @@
     }
   </style>
 
-  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']],
+        processEscapes: true
+      },
+      svg: {
+        fontCache: 'global'
+      },
+      startup: {
+        ready: () => {
+          MathJax.startup.defaultReady();
+          MathJax.startup.promise.then(() => {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+              window.MathJax.typesetPromise();
+            }
+          });
+        }
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
   <header>
@@ -542,7 +564,7 @@
         <div id="story" class="tab-content active">
           <div class="concept-card">
             <h3>一句話版本</h3>
-            <p>每個月塑膠先損失一點質量，這些磨耗掉的質量再依負二項分布分布，重新分配到比母體更小的粒徑箱。</p>
+            <p>每個月塑膠先損失一點質量，這些磨耗掉的質量再依負二項分布，重新分配到比母體更小的粒徑箱。</p>
           </div>
 
           <div class="flow">
@@ -586,27 +608,27 @@
             </div>
 
             <div id="formulaLatex" class="formula formula-view">
-              $$
-              &bsol;mathrm{PMF}_{m}(k)=
-              &bsol;frac{&bsol;Gamma(k+f)}{&bsol;Gamma(k+1)&bsol;Gamma(f)}
+              \\[ 
+              \mathrm{PMF}_{m}(k)=
+              \frac{\Gamma(k+f)}{\Gamma(k+1)\Gamma(f)}
               p^{k}(1-p)^{f}
-              $$
+              \\]
             </div>
 
             <div id="formulaMarkdown" class="formula formula-view hidden">
               <pre class="codeblock">```math
-&bsol;mathrm{PMF}_{m}(k)=
-&bsol;frac{&bsol;Gamma(k+f)}{&bsol;Gamma(k+1)&bsol;Gamma(f)}
+\mathrm{PMF}_{m}(k)=
+\frac{\Gamma(k+f)}{\Gamma(k+1)\Gamma(f)}
 p^{k}(1-p)^{f}
 ```
 
 或使用 LaTeX display math：
 
-$$
-&bsol;mathrm{PMF}_{m}(k)=
-&bsol;frac{&bsol;Gamma(k+f)}{&bsol;Gamma(k+1)&bsol;Gamma(f)}
+\[
+\mathrm{PMF}_{m}(k)=
+\frac{\Gamma(k+f)}{\Gamma(k+1)\Gamma(f)}
 p^{k}(1-p)^{f}
-$$</pre>
+\]</pre>
             </div>
 
             <p>這個公式會先給每個「可能的較小粒徑箱」一個權重，接著再標準化，讓所有權重加起來等於 1。</p>
@@ -620,18 +642,18 @@ $$</pre>
             </div>
 
             <div id="massLatex" class="formula formula-view">
-              $$
+              \\[
               E_i(t)=rM_i(t)
-              $$
-              $$
+              \\]
+              \\[
               M_i(t+1)=M_i(t)-E_i(t)
-              $$
-              $$
+              \\]
+              \\[
               M_j(t+1)=M_j(t)+E_i(t)w_{ij}
-              $$
-              $$
-              w_{ij}=&bsol;frac{&bsol;mathrm{PMF}_{m}(k_j)}{&bsol;sum_{j<i}&bsol;mathrm{PMF}_{m}(k_j)}
-              $$
+              \\]
+              \\[
+              w_{ij}=\frac{\mathrm{PMF}_{m}(k_j)}{\sum_{j<i}\mathrm{PMF}_{m}(k_j)}
+              \\]
             </div>
 
             <div id="massMarkdown" class="formula formula-view hidden">
@@ -648,7 +670,7 @@ M_j(t+1)=M_j(t)+E_i(t)w_{ij}
 ```
 
 ```math
-w_{ij}=&bsol;frac{&bsol;mathrm{PMF}_{m}(k_j)}{&bsol;sum_{j<i}&bsol;mathrm{PMF}_{m}(k_j)}
+w_{ij}=\frac{\mathrm{PMF}_{m}(k_j)}{\sum_{j<i}\mathrm{PMF}_{m}(k_j)}
 ```</pre>
             </div>
 
@@ -667,7 +689,7 @@ w_{ij}=&bsol;frac{&bsol;mathrm{PMF}_{m}(k_j)}{&bsol;sum_{j<i}&bsol;mathrm{PMF}_{
           <div class="concept-card">
             <h3>方法章可以這樣寫</h3>
             <p>
-              本研究使用質量基礎的負二項分布碎片化模型，模擬浮力塑膠在長期風化與磨耗後的粒徑轉移。於每個月時間步中，各非終端粒徑箱會依指定降解率損失部分質量；此被磨耗出的質量再依負二項分布機率分布重新分配至較小粒徑箱。為確保質量守恆，所有可分配至較小粒徑箱的機率會進行標準化，使每月損失質量完整轉移至子粒徑箱。
+              本研究使用質量基礎的負二項分布碎片化模型，模擬浮力塑膠在長期風化與磨耗後的粒徑轉移。於每個月時間步中，各非終端粒徑箱會依指定降解率損失部分質量；此被磨耗出的質量再依負二項機率分布重新分配至較小粒徑箱。為確保質量守恆，所有可分配至較小粒徑箱的機率會進行標準化，使每月損失質量完整轉移至子粒徑箱。
             </p>
           </div>
           <div class="concept-card">
